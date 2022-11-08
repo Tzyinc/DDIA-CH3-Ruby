@@ -43,7 +43,7 @@ class IndexedDb
   end
 
   def get(key)
-    offset = @index[key.to_s]
+    byte_offset = @index[key.to_s]
     get_value(byte_offset)
   end
 
@@ -53,13 +53,13 @@ class IndexedDb
     output = nil
     File.open(@file_name) do |f|
       f.seek(byte_offset, :SET)
-      content, * = f.read.split(DELIMINATOR)
-      output = content
+      output = f.readline(DELIMINATOR)
     end
     output
   end
 end
 
 db = IndexedDb.new
+# db.set('test4', 1)
 puts db.get('test3')
 puts db.get(:test3)
