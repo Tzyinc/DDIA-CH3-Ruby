@@ -2,47 +2,64 @@
 
 require 'json'
 
-class IndexedDb
-  @file_name = 'indexedDb.txt'
-  @index_name = 'index.json'
-  @delim = ';'
-  @hash = JSON.parse(File.read(@index_name)) || {}
+class PersistedHash
+  attr_reader :file_name, :hash
 
-  def self.db_set(key, val)
-    index = File.size(@file_name)
-    @hash[key.to_sym] = index
-    File.write(@file_name, "#{key}:#{val}#{@delim}", mode: 'a')
-    IndexedDb.save_hash
+  def initialize(file_name = 'index.json')
+    @file_name = file_name
+    @hash = JSON.parse(File.read(file_name)) || {}
   end
 
-  def self.db_get(key)
-    output = nil
-
-    case key
-    when String
-      output = IndexedDb.db_get_from_index(@hash[key])
-    when Symbol
-      output = IndexedDb.db_get_from_index(@hash[key.to_s])
-    end
-    output
+  def [](key)
+    hash[key]
   end
 
-  def self.db_get_from_index(search_index)
-    output = nil
-    File.open(@file_name) do |f|
-      f.seek(search_index, :SET)
-      content, * = f.read.split(@delim)
-      output = content
-    end
-    output
+  def []=(key, byte_offset)
+    hash[key] = byte_offset
+    save_hash
   end
 
-  def self.save_hash
-    File.open(@index_name, 'w+') do |f|
-      f << @hash.to_json
+  private
+
+  def save_hash
+    File.open(file_name, 'w+') do |f|
+      f << hash.to_json
     end
   end
 end
 
-puts IndexedDb.db_get('test3')
-puts IndexedDb.db_get(:test3)
+class IndexedDb
+  DELIMINATOR = ';'
+
+  def initialize(file_name = 'indexedDb.txt')
+    @file_name = file_name
+    @index = PersistedHash.new
+  end
+
+  def set(key, val)
+    byte_offset = File.size(@file_name)
+    File.write(@file_name, "#{key}:#{val}#{DELIMINATOR}", mode: 'a')
+    @index[key] = byte_offset
+  end
+
+  def get(key)
+    offset = @index[key.to_s]
+    get_value(byte_offset)
+  end
+
+  private
+
+  def get_value(byte_offset)
+    output = nil
+    File.open(@file_name) do |f|
+      f.seek(byte_offset, :SET)
+      content, * = f.read.split(DELIMINATOR)
+      output = content
+    end
+    output
+  end
+end
+
+db = IndexedDb.new
+puts db.get('test3')
+puts db.get(:test3)
