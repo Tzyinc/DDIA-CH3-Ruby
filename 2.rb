@@ -22,8 +22,8 @@ class PersistedHash
   private
 
   def save_hash
-    File.open(file_name, 'w+') do |f|
-      f << hash.to_json
+    File.open(file_name, 'w') do |file|
+      JSON.dump(hash, file)
     end
   end
 end
