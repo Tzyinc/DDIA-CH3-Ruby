@@ -7,7 +7,7 @@ class PersistedHash
 
   def initialize(file_name = 'index.json')
     @file_name = file_name
-    @hash = JSON.parse(File.read(file_name)) || {}
+    @hash = JSON.load_file(file_name) || {}
   end
 
   def [](key)
