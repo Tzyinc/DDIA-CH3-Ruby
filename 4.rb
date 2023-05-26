@@ -171,13 +171,13 @@ class BPlusTree
   end
 end
 
-# btree = BPlusTree.new(3)
-# btree.insert('test', 1)
-# pp btree.insert('test3', 3)
-# pp btree.insert('test2', 2)
-# btree.insert('test5', 5)
-# btree.insert('test6', 6)
-# btree.insert('test4', 4)
-# pp btree.insert('test3', 7)
+btree = BPlusTree.new(3)
+btree.insert('test', 1)
+pp btree.insert('test3', 3)
+pp btree.insert('test2', 2)
+btree.insert('test5', 5)
+btree.insert('test6', 6)
+btree.insert('test4', 4)
+pp btree.insert('test3', 7)
 
 # pp btree.find('test3'), btree.find('test6')
